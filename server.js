@@ -37,8 +37,8 @@ app.get("/scrape", function (req, res) {
   axios.get("http://www.spaceweather.com/").then(function (response) {
     // Then, we load that into cheerio and save it to $ for a shorthand selector
     var $ = cheerio.load(response.data);
-    const articleArr = [];
-    // Now, we grab every h2 within an article tag, and do the following:
+    const neoArr = [];
+    // Now, we grab every h2 within an Neo tag, and do the following:
     $("td font").each(function (i, element) {
       // Save an empty result object
       var result = {};
@@ -51,11 +51,11 @@ app.get("/scrape", function (req, res) {
         .children("a")
         .attr("href");
 
-      articleArr.push(result);
-     
+      neoArr.push(result);
+    //  NeoArr    webmaster@ssd.jpl.nasa.gov
     });
 
-    db.Article.create(articleArr)
+    db.Neo.create(neoArr)
       .then(() => res.send("Scrape Complete"))
       .catch(err => {
         console.log(err);
@@ -65,13 +65,13 @@ app.get("/scrape", function (req, res) {
   });
 });
 
-// Route for getting all Articles from the db
-app.get("/articles", function (req, res) {
-  // Grab every document in the Articles collection
-  db.Article.find({title: {$exists: true}, $where: "this.title.length < 12"})
-    .then(function (dbArticle) {
-      // If we were able to successfully find Articles, send them back to the client
-      res.json(dbArticle);
+// Route for getting all Neos from the db
+app.get("/neo", function (req, res) {
+  // Grab every document in the Neos collection
+  db.Neo.find({title: {$exists: true}, $where: "this.title.length < 12"})
+    .then(function (dbNeo) {
+      // If we were able to successfully find Neos, send them back to the client
+      res.json(dbNeo);
     })
     .catch(function (err) {
       // If an error occurred, send it to the client
@@ -79,15 +79,15 @@ app.get("/articles", function (req, res) {
     });
 });
 
-// Route for grabbing a specific Article by id, populate it with it's note
-app.get("/articles/:id", function (req, res) {
+// Route for grabbing a specific Neo by id, populate it with it's note
+app.get("/neo/:id", function (req, res) {
   // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
-  db.Article.findOne({ _id: req.params.id })
+  db.Neo.findOne({ _id: req.params.id })
     // ..and populate all of the notes associated with it
     .populate("note")
-    .then(function (dbArticle) {
-      // If we were able to successfully find an Article with the given id, send it back to the client
-      res.json(dbArticle);
+    .then(function (dbNeo) {
+      // If we were able to successfully find an Neo with the given id, send it back to the client
+      res.json(dbNeo);
     })
     .catch(function (err) {
       // If an error occurred, send it to the client
@@ -95,16 +95,16 @@ app.get("/articles/:id", function (req, res) {
     });
 });
 
-// Route for saving/updating an Article's associated Note
-app.post("/articles/:id", function (req, res) {
+// Route for saving/updating an Neo's associated Note
+app.post("/neo/:id", function (req, res) {
   // Create a new note and pass the req.body to the entry
   db.Note.create(req.body)
     .then(function (dbNote) {
-      return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
+      return db.Neo.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
     })
-    .then(function (dbArticle) {
-      // If we were able to successfully update an Article, send it back to the client
-      res.json(dbArticle);
+    .then(function (dbNeo) {
+      // If we were able to successfully update an Neo, send it back to the client
+      res.json(dbNeo);
     })
     .catch(function (err) {
       // If an error occurred, send it to the client

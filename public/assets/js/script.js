@@ -1,44 +1,45 @@
 $(document).ready(function() {
-  function getArticles() {
+  function getNeos() {
     $.ajax({
       method: 'GET',
-      url: '/articles'
-    }).then(function(dbArticles) {
-      dbArticles.forEach(article => {
+      url: '/neo'
+    }).then(function(dbNeos) {
+      dbNeos.forEach(neo => {
         $('<li>')
-          .addClass('list-group-item article')
-          .append(article.title)
-          .attr('data-id', article._id)
-          .appendTo($('#articles'));
+          .addClass('list-group-item neo')
+          .append(neo.title)
+          .attr('data-id', neo._id)
+          .appendTo($('#neos'));
       });
     });
   }
 
-  $('#articles').on('click', '.article', function() {
+  $('#neos').on('click', '.neo', function() {
 
-    const articleId = $(this).attr('data-id');
+    const neoId = $(this).attr('data-id');
     $('#note-title').val('');
     $('#note-body').val('');
     
     $.ajax({
-      url: `/articles/${articleId}`,
+      url: `/neo/${neoId}`,
       method: 'GET'
-    }).then(function(articleData) {
-      console.log(articleData);
-      $('#submit-note').attr('data-id', articleData._id).attr("data-note-id", articleData.note._id);
-      $('#article-link')
-        .attr('href', articleData.link)
-        .text(articleData.title);
-      $('#note-body').val(articleData.note.body);
-      $('#note-title').val(articleData.note.title);
+    }).then(function(neoData) {
+      console.log(neoData);
+      $('#submit-note').attr('data-id', neoData._id);
+    // .attr("data-note-id", neoData.note._id);
+      $('#neo-link')
+        .attr('href', neoData.link)
+        .text(neoData.title);
+      $('#note-body').val(neoData.note.body);
+      $('#note-title').val(neoData.note.title);
     });
   });
 
   $('#submit-note').on('click', function(e) {
     e.preventDefault();
 
-    const articleId = $(this).attr('data-id');
-    if (!articleId) {
+    const neoId = $(this).attr('data-id');
+    if (!neoId) {
       return false;
     }
 
@@ -52,7 +53,7 @@ $(document).ready(function() {
     };
 
     $.ajax({
-      url: `/articles/${articleId}`,
+      url: `/neo/${neoId}`,
       method: 'POST',
       data: noteData
     }).then(function(data) {
@@ -62,5 +63,5 @@ $(document).ready(function() {
     });
   });
 
-  getArticles();
+  getNeos();
 });
